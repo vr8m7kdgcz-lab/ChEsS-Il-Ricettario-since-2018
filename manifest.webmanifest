@@ -1,0 +1,30 @@
+{
+ "name": "Ricettario ChEsS’è since 2018",
+ "short_name": "ChEsS’è",
+ "description": "Ricettario cocktail",
+ "start_url": "./index.html",
+ "scope": "./",
+ "display": "standalone",
+ "orientation": "portrait",
+ "background_color": "#f7f8f8",
+ "theme_color": "#014040",
+ "lang": "it",
+ "icons": [
+  {
+   "src": "icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  },
+  {
+   "src": "icon-maskable-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}

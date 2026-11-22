@@ -1,0 +1,13 @@
+Ricettario ChEsS'è since 2018 - app installabile (PWA)
+
+PRIMA VOLTA (GitHub Pages)
+1) Su GitHub crea un repository pubblico nuovo, es. "ChEsS-ricettario".
+2) Carica TUTTI i file di questa cartella nella radice del repository (Add file > Upload files).
+3) Settings > Pages > Source: "Deploy from a branch", Branch: main, cartella / (root). Salva.
+4) Dopo 1-2 minuti il link sara https://<tuo-utente>.github.io/ChEsS-ricettario/
+5) iPhone/iPad (Safari): Condividi > Aggiungi a Home. Android/Chrome (tablet Lenovo): menu > Installa app.
+Dopo la prima apertura funziona anche senza rete.
+
+AGGIORNARE
+Sostituisci index.html con la nuova versione e cambia la versione in sw.js (chess-v2 -> chess-v3).
+I colleghi vedono l'aggiornamento alla prima apertura con connessione (a volte alla seconda).
