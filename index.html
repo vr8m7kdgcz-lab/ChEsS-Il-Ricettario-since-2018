@@ -839,7 +839,7 @@ $("q").oninput=render;
 chips();render();
 
 /* ===== app: nuove ricette + area manager ===== */
-function saveUR(){try{localStorage.setItem("chessUR",JSON.stringify(R.filter(r=>r.u).map(r=>r.slice(0,9))))}catch(e){alert("Impossibile salvare su questo dispositivo")}}
+function saveUR(){try{localStorage.setItem("chessUR",JSON.stringify(R.filter(r=>r.u).map(r=>r.slice(0,10))))}catch(e){alert("Impossibile salvare su questo dispositivo")}}
 function mkDlg(id,html){let d=document.getElementById(id);if(!d){d=document.createElement("div");d.id=id;d.className="dlg";document.body.appendChild(d);d.addEventListener("click",e=>{if(e.target===d)d.classList.remove("on")})}d.innerHTML='<div class="sh">'+html+'</div>';return d}
 const esc2=x=>String(x??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const GL=["Tumbler alto","Tumbler basso","Coppetta","Flûte","Calice","Tiki","Mug","Boccale","Hurricane","Pilsner","Snifter","Punch bowl"];
@@ -856,10 +856,18 @@ function openForm(idx){
   <label for="fi">Ingredienti (uno per riga, es. 45 ml gin)</label><textarea id="fi">${esc2(e?e[4].join("\n"):"")}</textarea>
   <label for="fd">Decorazione</label><input id="fd" value="${esc2(e?e[5]:"")}">
   <label for="fp">Procedimento</label><textarea id="fp">${esc2(pr)}</textarea>
+  <label>Foto (facoltativa)</label>
+  <div style="display:flex;gap:12px;align-items:center"><img id="fpi" alt="" style="width:84px;height:84px;object-fit:cover;border-radius:8px;background:var(--chip);display:none"><div style="flex:1"><input type="file" id="fpf" accept="image/*"><button id="fpr" type="button" style="display:none;margin-top:8px;font:inherit;font-size:14px;padding:6px 12px;border-radius:10px;border:1px solid var(--line);background:var(--chip);color:var(--ink)">Rimuovi foto</button></div></div>
   <label class="chk"><input type="checkbox" id="fal" ${!e||e[8]?"checked":""}> Contiene alcol</label>
   <div class="err" id="ferr"></div>
   <div class="bt"><button class="p" id="fok" type="button">Salva</button><button id="fno" type="button">Annulla</button></div>`);
   d.classList.add("on");
+  let photo=(e&&e[9])||"";const pi=d.querySelector("#fpi"),pr2=d.querySelector("#fpr");
+  const showP=()=>{pi.style.display=photo?"block":"none";pr2.style.display=photo?"inline-block":"none";if(photo)pi.src=photo};showP();
+  pr2.onclick=()=>{photo="";d.querySelector("#fpf").value="";showP()};
+  d.querySelector("#fpf").onchange=ev=>{const f=ev.target.files&&ev.target.files[0];if(!f)return;const u=URL.createObjectURL(f),im=new Image();
+    im.onload=()=>{const S=200,c=document.createElement("canvas");c.width=c.height=S;const m=Math.min(im.naturalWidth,im.naturalHeight),sx=(im.naturalWidth-m)/2,sy=(im.naturalHeight-m)/2;c.getContext("2d").drawImage(im,sx,sy,m,m,0,0,S,S);photo=c.toDataURL("image/jpeg",.8);URL.revokeObjectURL(u);showP()};
+    im.onerror=()=>{URL.revokeObjectURL(u);d.querySelector("#ferr").textContent="Non riesco a leggere questa foto"};im.src=u};
   d.querySelector("#fno").onclick=()=>d.classList.remove("on");
   d.querySelector("#fok").onclick=()=>{
     const n=d.querySelector("#fn").value.trim(),ing=d.querySelector("#fi").value.split("\n").map(x=>x.trim()).filter(Boolean);
@@ -867,6 +875,7 @@ function openForm(idx){
     if(!ing.length){d.querySelector("#ferr").textContent="Inserisci almeno un ingrediente";return}
     const sec=[];const a=d.querySelector("#fa").value.trim();if(a)sec.push(["Anno",a]);const p=d.querySelector("#fp").value.trim();if(p)sec.push(["Preparazione",p.replace(/\n+/g," ")]);
     const row=[n,d.querySelector("#fg").value,d.querySelector("#ft").value,d.querySelector("#fv").value.trim(),ing,d.querySelector("#fd").value.trim(),sec,d.querySelector("#fs").value.trim()||"Aggiunte in app",d.querySelector("#fal").checked?1:0];
+    if(photo)row[9]=photo;
     row.u=1;
     if(e){const i=R.indexOf(e);R[i]=row}else R.push(row);
     R.forEach(r=>{r._s=undefined;r._ice=undefined;r.f={};GR.forEach(([k,,fn])=>{r.f[k]=fn(r)})});
