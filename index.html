@@ -69,6 +69,31 @@ main{padding:6px 24px 40px}
 }
 @media (min-width:900px) and (max-height:700px){.cover img{max-height:20vh}}
 
+.occ-h{grid-column:1/-1;padding:4px 0 8px}
+.occ-h select{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--chip);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.occ-h .chips{padding:10px 0 0;flex-wrap:wrap}
+.occ-s{margin:14px 0 4px}.occ-s h2{margin:0;font-size:19px;display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid var(--red);padding-bottom:4px}
+.occ-s h2 span{font-size:12px;font-weight:600;color:var(--mute);text-transform:uppercase;letter-spacing:.05em}
+.occ-s details{border-bottom:1px solid var(--line)}.occ-s summary{padding:9px 0;align-items:center;justify-content:flex-start;gap:10px}
+.occ-s .t{flex:1;min-width:0;font-weight:600}.occ-s .c{font-size:13px;color:var(--mute);flex:none}
+.occ-s input[type=checkbox]{width:22px;height:22px;flex:none;accent-color:var(--red)}
+.occ-s .dl{padding:0 0 10px 32px;font-size:14px;color:var(--mute)}
+.occ-s .done .t{text-decoration:line-through;opacity:.55}
+
+.occ-print{display:none}
+@media print{
+html,body{background:#fff!important;color:#000!important}
+body::before,.cover,.bar,#bk,.dlg,#mgr,.occ-h select,.occ-h .chips,.acts{display:none!important}
+main{padding:0}.wrap{max-width:none}
+#list{display:block!important;column-count:2;column-gap:28px;font-size:13px}
+.occ-h{display:block;column-span:all;padding:0 0 8px;border-bottom:2px solid #000;margin-bottom:6px}
+.occ-print{display:block;font-size:15px}
+.occ-s{break-inside:avoid-column;margin:10px 0 2px}.occ-s h2{font-size:15px;border-bottom:1px solid #000}.occ-s h2 span{color:#000}
+.occ-s summary{padding:3px 0}.occ-s .dl{display:none}.occ-s details{border-bottom:1px dotted #999;break-inside:avoid}
+.occ-s .t{font-weight:500}.occ-s .c{color:#000}.occ-s a.pl{text-decoration:none}
+.occ-s input[type=checkbox]{width:15px;height:15px}
+}
+
 .acts{display:flex;gap:8px;margin:0 0 10px}
 .acts button,.ub button{font:inherit;font-size:14px;font-weight:600;color:var(--ink);background:var(--chip);border:1px solid var(--line);border-radius:10px;padding:7px 12px;cursor:pointer}
 .ub{display:flex;gap:8px;margin-top:12px}
@@ -812,7 +837,7 @@ R.forEach(r=>{r.f={};GR.forEach(([k,,fn])=>{r.f[k]=fn(r)})});
 function opts(k){const m={};base().forEach(r=>r.f[k].forEach(v=>{m[v]=(m[v]||0)+1}));return Object.entries(m).sort((a,b)=>k==="y"?(a[0]==="Non indicato")-(b[0]==="Non indicato")||b[0].localeCompare(a[0]):a[0].localeCompare(b[0],"it"))}
 let subC=false;
 function chips(){
-  const tb=$("tabs");tb.innerHTML="";[["d","Drink"],["p","Preparazioni"]].forEach(([v,n])=>{const b=document.createElement("button");b.textContent=n+" "+R.filter(r=>PREP(r)===(v==="p")).length;b.setAttribute("aria-pressed",VIEW===v);b.onclick=()=>{if(VIEW===v)return;BK=null;VIEW=v;Object.keys(F).forEach(k=>{F[k]=[]});G="";subC=false;chips();render();showBack()};tb.appendChild(b)});
+  const tb=$("tabs");tb.innerHTML="";[["d","Drink"],["p","Preparazioni"],["o","Occorrente"]].forEach(([v,n])=>{const b=document.createElement("button");b.textContent=v==="o"?n:n+" "+R.filter(r=>PREP(r)===(v==="p")).length;b.setAttribute("aria-pressed",VIEW===v);b.onclick=()=>{if(VIEW===v)return;BK=null;VIEW=v;Object.keys(F).forEach(k=>{F[k]=[]});G="";subC=false;chips();render();showBack()};tb.appendChild(b)});
   const gp=$("groups");gp.innerHTML="";
   GR.forEach(([k,n])=>{if(k==="q")return;const b=document.createElement("button");const a=F[k].length+(k==="i"?F.q.length:0);b.textContent=n+(a?" ("+a+")":"");b.setAttribute("aria-pressed",a>0);b.setAttribute("aria-expanded",G===k);b.onclick=()=>{G=G===k?"":k;chips()};gp.appendChild(b)});
   if(GR.some(([k])=>F[k].length)){const x=document.createElement("button");x.textContent="Azzera filtri";x.className="clr";x.onclick=()=>{Object.keys(F).forEach(k=>{F[k]=[]});subC=false;chips();render()};gp.appendChild(x)}
@@ -826,15 +851,71 @@ function chips(){
 const plink=t=>{const lo=t.toLowerCase();const o=lo.startsWith("dash ")?5:0;for(const r of R){if(!PREP(r))continue;const l=r[0].toLowerCase();if(lo.startsWith(l,o)){const post=lo.slice(o+l.length);if(post===""||post.startsWith(" (")||post.startsWith(",")){return t.slice(0,o)+`<a class="pl" href="#" data-p="${r[0].replace(/"/g,"&quot;")}" title="Vai alla preparazione">${t.slice(o,o+l.length)}</a>`+t.slice(o+l.length)}}}return t};
 let BK=null;
 function goPrep(n,from){BK=from||null;VIEW="p";Object.keys(F).forEach(k=>{F[k]=[]});G="";subC=false;$("q").value=n;chips();render();const d=[...document.querySelectorAll("#list > details")].find(x=>x.querySelector(".n").firstChild.textContent===n)||document.querySelector("#list > details");if(d){d.open=true;d.scrollIntoView({block:"center"})}showBack()}
-function showBack(){let b=$("bk");if(!b){b=document.createElement("button");b.id="bk";b.type="button";document.body.appendChild(b);b.onclick=()=>{const k=BK;BK=null;if(!k)return;VIEW="d";Object.keys(F).forEach(x=>{F[x]=(k.F[x]||[]).slice()});G="";subC=k.subC;$("q").value=k.q;chips();render();const d=[...document.querySelectorAll("#list > details")].find(x=>x.querySelector(".n").firstChild.textContent===k.n);if(d){d.open=true;d.scrollIntoView({block:"center"})}else scrollTo(0,k.y);showBack()}}
-b.style.display=BK&&VIEW==="p"?"block":"none";if(BK)b.textContent="← Torna a "+BK.n}
-$("list").addEventListener("click",e=>{const a=e.target.closest&&e.target.closest("a.pl");if(a){e.preventDefault();const dt=a.closest("#list > details");goPrep(a.dataset.p,{n:dt?dt.querySelector(".n").firstChild.textContent:"",q:$("q").value,F:JSON.parse(JSON.stringify(F)),subC:subC,y:scrollY})}});
+function showBack(){let b=$("bk");if(!b){b=document.createElement("button");b.id="bk";b.type="button";document.body.appendChild(b);b.onclick=()=>{const k=BK;BK=null;if(!k)return;VIEW=k.v||"d";Object.keys(F).forEach(x=>{F[x]=(k.F[x]||[]).slice()});G="";subC=k.subC;$("q").value=k.q;chips();render();const d=[...document.querySelectorAll("#list > details")].find(x=>x.querySelector(".n").firstChild.textContent===k.n);if(d){d.open=true;d.scrollIntoView({block:"center"})}else scrollTo(0,k.y);showBack()}}
+b.style.display=BK&&VIEW==="p"?"block":"none";if(BK)b.textContent="← Torna a "+(BK.n||(BK.v==="o"?"Occorrente":"elenco"))}
+$("list").addEventListener("click",e=>{const a=e.target.closest&&e.target.closest("a.pl");if(a){e.preventDefault();const dt=a.closest("#list > details");goPrep(a.dataset.p,{v:VIEW,n:dt?dt.querySelector(".n").firstChild.textContent:"",q:$("q").value,F:JSON.parse(JSON.stringify(F)),subC:subC,y:scrollY})}});
 function render(){
+  ["q","groups","chips","subchips","active"].forEach(i=>{const e=$(i);if(e)e.style.display=VIEW==="o"?"none":""});
+  if(VIEW==="o"){renderOcc();return}
   const q=$("q").value.trim().toLowerCase();
   const L=base().sort((a,b)=>a[0].localeCompare(b[0],"it")).filter(r=>GR.every(([k])=>!F[k].length||r.f[k].some(v=>F[k].includes(v)))&&(!q||[r[0],sfx(r),srcs(r).join(" "),twd(r)?"twist "+twd(r):"",sap(r)||"",...r[4],r[5],...r[6].flat(),...(VERS[r[0]+"|"+src(r)]||[]).flatMap(v=>[...v[1][4],v[1][5]])].join(" ").toLowerCase().includes(q)));
   $("cnt").textContent=L.length+" di "+base().length;
   $("list").innerHTML=L.length?L.map(r=>`<details><summary><span><span class="n">${r[0]}${sfx(r)?`<span class="var">${sfx(r)}</span>`:""}</span><span class="src">${srcs(r).join(", ")}${twd(r)?", Twist "+twd(r):""}</span></span><span class="m">${dots(r)}</span></summary><div class="body"><div class="hd"><div class="hdl">${spec(r)}</div>${r[9]?`<img class="ph" alt="" src="${r[9]}">`:""}</div><ul>${r[4].map(s=>{const m=s.match(/^(\S+(?: (?:ml|tsp|foglie|gocce|twist))?) (.+)$/);const tx=m?m[2]:s;return `<li><b>${m?m[1]:""}</b>${VIEW==='d'?plink(tx):tx}</li>`}).join("")}</ul>${r[5]?`<p class="d"><b>Decorazione:</b> ${r[5]}</p>`:""}${r[6].map(p=>`<div class="p"><h3>${p[0]}</h3><p>${p[1]}</p></div>`).join("")}${vers(r)}${r.u?`<div class="ub"><button type="button" data-ue="${R.indexOf(r)}">Modifica</button><button type="button" data-ud="${R.indexOf(r)}">Elimina</button></div>`:""}</div></details>`).join(""):`<p class="empty">Nessuna ricetta trovata. Prova con un altro ingrediente o togli un filtro.</p>`;
 }
+
+const esc2=x=>String(x??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+/* ===== Occorrente: cosa serve sul bancone e in frigo per ogni menu ===== */
+const OCC={m:localStorage.getItem("occM")||"",loc:"all",un:false};
+let OCK={};try{OCK=JSON.parse(localStorage.getItem("occChk")||"{}")}catch(e){}
+const OG=[["Distillati","B",/\b(gin|vodka|rum|rhum|cacha[cç]a|pisco|tequila|mezcal|whisk(?:e)?y|bourbon|rye|scotch|brandy|cognac|armagnac|calvados|grappa|genever|aquavit|singani|soju|distillat[oi]|spirit|acquavite|arrack|havana|clairin|tanqueray|beefeater|jameson|gordon.s|monkey shoulder|nikka|grant.s|lagavulin|laphroaig|brugal|roku|espol[oò]n|bruxo|jenever|shochu|sak[eè]|aguardiente|ron|agricolo|petrus|plymouth|bombay|hendrick.s|bulleit|jim beam|angostura 1919|diplomatico|zacapa|appleton|el dorado|mount gay|don julio|patr[oó]n|casamigos|olmeca|sierra|montelobos|del maguey|ilegal|vida)\b/i],
+ ["Home made","F",null],
+ ["Bitter aromatici","B",/angostura|peychaud|\bbitters\b|bitter (?:aromatic|al cioccolato|all.arancia|di)|(?:chocolate|orange|aromatic|mole|cardamom|cioccolato|arancia) bitter/i],
+ ["Liquori, amari e aperitivi","B",/\b(amaro|amari|liquore|liquori|bitter|aperitivo|campari|aperol|select|cynar|fernet|montenegro|averna|maraschino|luxardo|cura[cç]ao|triple sec|cointreau|chartreuse|amaretto|disaronno|limoncello|sambuca|crema di (?!cocco)\w+|st[- .]?germain|falernum|benedictine|strega|galliano|frangelico|baileys|kahl[uú]a|nocino|genziana|china|orgeat|midori|cherry heering|maraska|passo[aã]|j[aä]germeister|mi\.?to|saronno|amaretto|liquor|licor|velvet|vecchio amaro|nocello|fior d.arancio|grand marnier|cr[eè]me de \w+|allspice dram|pimento dram|b[eé]n[eé]dictine|italicus|ancho reyes|ratafi[aà]|drambuie|suze|becherovka|pastis|assenzio|pernod|chambord|saint germain|elder ?flower|kina|alpestre|amer picon|pimm.s|braulio|amargo|cardamaro|punt e mes|biancosarti|crodino|cedrata|ciociaro|southern comfort|calpico|aperitivo|bitter|arancino|tassoni|sarti|zafferano liquore|ouzo|raki|anisetta|cacao liquore|chinotto liquore)\b/i],
+ ["Vermouth, vini e bollicine","F",/\b(vermouth|vermut|vino|prosecco|champagne|spumante|franciacorta|sherry|xeres|jerez|porto|marsala|madeira|lillet|cocchi|cinzano|martini|dubonnet|moscato|sauvignon|bollicine|cava|brut|rosato|trento|metodo classico|carpano|bordiga|pas dos[eé]|kori|korì|dolin|noilly|vino)\b/i],
+ ["Succhi e puree","F",/\b(succo|puree|purea|puré|polpa|nettare|spremuta|passata|estratto|acqua di cocco|latte di cocco|crema di cocco|cocco)\b/i],
+ ["Sodati, toniche e birre","F",/\b(soda|tonica|tonic|ginger beer|ginger ale|cola|coca|sprite|birra|sanbitter|limonata|aranciata|chinotto|gassosa|seltz|acqua frizzante|acqua gassata|acqua tonica)\b/i],
+ ["Latticini e uova","F",/\b(latte|panna|uov[oa]|albume|tuorlo|yogurt|burro|gelato|cream|ricotta|mascarpone)\b/i],
+ ["Frutta, erbe e spezie","F",/\b(menta|basilico|rosmarino|salvia|timo|origano|coriandolo|prezzemolo|foglie|foglia|zenzero|lime|limone|limoni|arancia|arance|arancio|pompelmo|mandarino|bergamotto|ananas|fragol\w*|lampon\w*|more|mirtill\w*|ribes|pesca|pera|mela|mango|passion|maracuja|cetriolo|peperoncino|pepe|cannella|vaniglia|cardamomo|chiodi di garofano|anice|zucca|fiori|viola|ibisco|lavanda|rosa|petali|twist|wedge|fetta|spicchio|banana|kiwi|melone|anguria|uva|fico|physalis|sedano|pomodor\w*|olive|oliva|cipolla|noce moscata|ciliegia|ciliegie|amarena|amarene|rabarbaro|kumquat|cumquat|litchi|lychee|timo|erba|erbe|ciuffo)\b/i]];
+const OHM=/\b(sciroppo|infus[oa]|shrub|cordial[ei]?|cordiale|oleo|honey mix|premix|prebatch|spuma|marmellata|cold brew|caramello|affumicat[oa]|clarificat[oa]|chiarificat[oa]|home ?made|salamoia|soda (?:al|alla|all'|ai|agli)|tonica (?:al|alla)|(?:vodka|gin|rum|tequila|mezcal|whiskey|brandy|bourbon|campari|vermouth|aperol|amaro|limoncello) (?:alla|al|all'|ai|agli|infus[oa])|mi\.?to\. (?:agli|al|alla|speziato|affumicato)|\bmix\b(?<!agrumi mix)|tepache|horchata|preparato|preparata)/i;
+function occCat(t,prep){
+  if(/^(ghiaccio|acqua|a piacere|1|scuro|bar spoon|cup|goccio di acqua|soluzione salina|citrus blend)\b/.test(t))return null;
+  const tt=t.normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+  if(prep.has(t)||OHM.test(tt)||/^succo di .+ (?:all.|al |alla |ai |agli |con )\w+/.test(tt))return "Home made";
+  for(const [n,,re] of OG){if(re&&re.test(tt))return n}
+  return "Dispensa e altro"}
+function occKey(raw){let t=String(raw).trim();
+  if(/^top\b/i.test(t))t=t.replace(/^top( di)?\s*/i,"");
+  else{const m=t.match(/^(\S+(?: (?:ml|cl|tsp|foglie|gocce|goccia|twist|dash|g|kg|l|pz))?) (.+)$/);if(m)t=m[2]}
+  t=t.replace(/^(?:pizzico|goccio|cucchiaio|spruzzata|splash|di)\s+(?:di\s+)?/i,"").replace(/\s*\([^)]*\)\s*/g," ").replace(/\s*,.*$/,"").replace(/^(?:facoltativo|q\.?b\.?)\s+/i,"").trim().toLowerCase();return t}
+function occRows(){const out=[];
+  R.forEach(r=>{if(PREP(r))return;out.push({n:r[0],m:srcs(r),i:r[4]})});
+  Object.keys(VERS).forEach(k=>VERS[k].forEach(([lb,v])=>{out.push({n:v[0]+" ("+lb.replace(/^Versione /,"")+")",m:[v[7]],i:v[4]})}));return out}
+function occMenus(){const c={};occRows().forEach(x=>x.m.forEach(m=>{c[m]=(c[m]||new Set()).add(x.n)}));return Object.entries(c).map(([m,s])=>[m,s.size]).sort((a,b)=>a[0].localeCompare(b[0],"it"))}
+function renderOcc(){
+  const menus=occMenus();if(OCC.m&&!menus.some(x=>x[0]===OCC.m))OCC.m="";
+  const prep=new Set(R.filter(PREP).map(r=>r[0].toLowerCase()));const prepName={};R.filter(PREP).forEach(r=>{prepName[r[0].toLowerCase()]=r[0]});
+  const rows=occRows().filter(x=>!OCC.m||x.m.includes(OCC.m));
+  const items={};rows.forEach(x=>{const seen=new Set();x.i.forEach(raw=>{const t=occKey(raw);if(!t||seen.has(t))return;seen.add(t);const c=occCat(t,prep);if(!c)return;const k=c+"|"+t;(items[k]=items[k]||{t,c,d:new Set()}).d.add(x.n)})});
+  const grp={};Object.values(items).forEach(it=>{(grp[it.c]=grp[it.c]||[]).push(it)});
+  const order=[...OG.map(g=>g[0]),"Dispensa e altro"];const locOf=n=>{const g=OG.find(x=>x[0]===n);return g?g[1]:"B"};
+  const ck=OCK[OCC.m||"*"]||{};
+  const drinks=new Set(rows.map(x=>x.n)).size;let tot=0;const allIt=Object.values(items),nCk=allIt.filter(it=>ck[it.c+"|"+it.t]).length;
+  let h=`<div class="occ-h"><select id="occm" aria-label="Menu"><option value="">Tutti i menu</option>${menus.map(([m,n])=>`<option value="${esc2(m)}" ${m===OCC.m?"selected":""}>${esc2(m)} (${n} drink)</option>`).join("")}</select>
+  <div class="chips">${[["all","Tutto"],["B","Bancone"],["F","Frigorifero"]].map(([v,n])=>`<button type="button" data-ol="${v}" aria-pressed="${OCC.loc===v}">${n}</button>`).join("")}<button type="button" id="occu" aria-pressed="${OCC.un}">Solo non spuntate</button><button type="button" id="occx">Azzera spunte</button><button type="button" id="occp">🖨 Stampa</button></div><div class="occ-print"><b>Occorrente · ${esc2(OCC.m||"Tutti i menu")}</b><br>${new Date().toLocaleString("it-IT",{dateStyle:"full",timeStyle:"short"})} · ${nCk} spuntate su ${allIt.length}${OCC.un?" · elenco: solo non spuntate":""}${OCC.loc!=="all"?" · "+(OCC.loc==="B"?"solo bancone":"solo frigorifero"):""}</div></div>`;
+  order.forEach(n=>{let g=grp[n];if(!g)return;const l=locOf(n);if(OCC.loc!=="all"&&OCC.loc!==l)return;
+    g=g.filter(it=>!(OCC.un&&ck[it.c+"|"+it.t]));if(!g.length)return;g.sort((a,b)=>a.t.localeCompare(b.t,"it"));tot+=g.length;
+    h+=`<section class="occ-s"><h2>${n}<span>${l==="B"?"Bancone":"Frigorifero"} · ${g.length}</span></h2>${g.map(it=>{const key=it.c+"|"+it.t,pn=n==="Home made"&&prep.has(it.t)?prepName[it.t]:"";const dn=[...it.d].sort((a,b)=>a.localeCompare(b,"it"));
+      return `<details class="${ck[key]?"done":""}"><summary><input type="checkbox" data-ok="${esc2(key)}" ${ck[key]?"checked":""} aria-label="Pronto"><span class="t">${pn?`<a class="pl" href="#" data-p="${esc2(pn)}">${esc2(it.t)}</a>`:esc2(it.t)}</span><span class="c">${dn.length} drink</span></summary><div class="dl">${dn.map(esc2).join(" · ")}</div></details>`}).join("")}</section>`});
+  $("list").innerHTML=h;$("cnt").textContent=drinks+" drink · "+tot+" voci"}
+$("list").addEventListener("change",e=>{
+  if(e.target.id==="occm"){OCC.m=e.target.value;try{localStorage.setItem("occM",OCC.m)}catch(x){}renderOcc();return}
+  const k=e.target.dataset&&e.target.dataset.ok;if(k!=null){const m=OCC.m||"*";OCK[m]=OCK[m]||{};if(e.target.checked)OCK[m][k]=1;else delete OCK[m][k];try{localStorage.setItem("occChk",JSON.stringify(OCK))}catch(x){}e.target.closest("details").classList.toggle("done",e.target.checked)}});
+$("list").addEventListener("click",e=>{
+  const b=e.target.closest&&e.target.closest("button[data-ol]");if(b){OCC.loc=b.dataset.ol;renderOcc();return}
+  if(e.target.id==="occu"){OCC.un=!OCC.un;renderOcc();return}
+  if(e.target.id==="occp"){window.print();return}
+  if(e.target.id==="occx"){delete OCK[OCC.m||"*"];try{localStorage.setItem("occChk",JSON.stringify(OCK))}catch(x){}renderOcc();return}
+  if(e.target.matches&&e.target.matches('input[data-ok]'))e.stopPropagation()});
 $("q").oninput=render;
 chips();render();
 
@@ -842,7 +923,6 @@ chips();render();
 function reidx(){R.forEach(r=>{r._s=undefined;r._ice=undefined;r.f={};GR.forEach(([k,,fn])=>{r.f[k]=fn(r)})})}
 function saveUR(){try{localStorage.setItem("chessUR",JSON.stringify(R.filter(r=>r.u).map(r=>r.slice(0,12))))}catch(e){alert("Impossibile salvare su questo dispositivo")}}
 function mkDlg(id,html){let d=document.getElementById(id);if(!d){d=document.createElement("div");d.id=id;d.className="dlg";document.body.appendChild(d);d.addEventListener("click",e=>{if(e.target===d)d.classList.remove("on")})}d.innerHTML='<div class="sh">'+html+'</div>';return d}
-const esc2=x=>String(x??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const GL=["Tumbler alto","Tumbler basso","Coppetta","Flûte","Calice","Tiki","Mug","Boccale","Hurricane","Pilsner","Snifter","Punch bowl"];
 const TE=["Build","Shake","Stir","Blend","Flash Blend","Throwing","Muddle"];
 function openForm(idx){
